@@ -22,12 +22,18 @@ heat_servo = servo.Servo(pwm_servo, min_pulse=500, max_pulse=2200)  # tune pulse
 # Initialize the sensor
 sensor = adafruit_bh1750.BH1750(i2c)
 
+mLux = 0
+
 def convert_light_degrees():
+    global mLux
     #take a reading
     lux = sensor.lux
     print("%.2f Lux" % lux)
+    mLux = max(lux, mLux)
+    print("%.2f max" % mLux)
     #map the reading between 0 and 90 degrees
-    maxLux = 2000 #tune this number
+    # maxLux = 2000 #tune this number
+    maxLux = 30000 #outdoor value
     minLux = 0
     amt = math.floor((lux - minLux)/(maxLux - minLux) * (90 - 0) + 0)
     print("range is +- %.2f" % amt)
@@ -41,7 +47,7 @@ def sweep(a):
     time.sleep(0.1) #give a beat to get to the min
     for angle in range(90 - amount, 90 + amount, 1):
         # print(angle)
-        print("%.2f degrees" % angle)
+        # print("%.2f degrees" % angle)
         heat_servo.angle = angle
         time.sleep(0.01)
     time.sleep(0.1) #give a beat to get to the max
